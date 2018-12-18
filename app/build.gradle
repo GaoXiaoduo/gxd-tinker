@@ -28,6 +28,11 @@ android {
          */
         buildConfigField "String", "TINKER_ID", "\"${getTinkerIdValue()}\""
         buildConfigField "String", "PLATFORM", "\"all\""
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
     }
     signingConfigs {
 
@@ -91,9 +96,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // 可选，用于生成application类
-    // provided('com.tencent.tinker:tinker-android-anno:1.9.1') { changing = true }
+    // compileOnly('com.tencent.tinker:tinker-android-anno:1.9.1') { changing = true }
     // tinker的核心库
-    // compile('com.tencent.tinker:tinker-android-lib:1.9.1') { changing = true }
+    // implementation('com.tencent.tinker:tinker-android-lib:1.9.1') { changing = true }
     // 可选，用于生成application类
     compileOnly "com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}"
     // tinker的核心库
@@ -115,7 +120,7 @@ def gitSha() {
 }
 
 def javaVersion = JavaVersion.VERSION_1_7
-// ？？？？
+// 基准安装包目录：可按自己的需求修改为适应自己工程的参数
 def bakPath = file("${buildDir}/bakApk/")
 /**
  * you can use assembleRelease to build you base apk
@@ -134,7 +139,6 @@ ext {
     tinkerApplyMappingPath = "${bakPath}/app-debug-1018-17-32-47-mapping.txt"
     //resource R.txt to build patch apk, must input if there is resource changed
     tinkerApplyResourcePath = "${bakPath}/app-debug-1018-17-32-47-R.txt"
-
     //only use for build all flavor, if not, just ignore this field
     tinkerBuildFlavorDirectory = "${bakPath}/app-1018-17-32-47"
 }
@@ -164,7 +168,9 @@ def getTinkerBuildFlavorDirectory() {
 }
 
 if (buildWithTinker()) {
+
     apply plugin: 'com.tencent.tinker.patch'
+
     tinkerPatch {
         /**
          * necessary，default 'null'
@@ -245,8 +251,7 @@ if (buildWithTinker()) {
             /**
              * 需要处理dex路径，支持*、?通配符，必须使用'/'分割。路径是相对安装包的，例如assets/...
              */
-            pattern = ["classes*.dex",
-                       "assets/secondary-dex-?.jar"]
+            pattern = ["classes*.dex", "assets/secondary-dex-?.jar"]
             /**
              * 这一项非常重要，它定义了哪些类在加载补丁包的时候会用到。这些类是通过Tinker无法修改的类，也是一定要放在main dex的类。
              * 这里需要定义的类有：
