@@ -1,23 +1,18 @@
 package com.gxd.tinker.app;
 
-import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.gxd.tinker.BuildConfig;
-import com.tencent.tinker.anno.DefaultLifeCycle;
-import com.tencent.tinker.entry.DefaultApplicationLike;
+import com.tencent.tinker.entry.ApplicationLike;
 import com.tencent.tinker.lib.listener.DefaultPatchListener;
 import com.tencent.tinker.lib.patch.UpgradePatch;
 import com.tencent.tinker.lib.reporter.DefaultLoadReporter;
 import com.tencent.tinker.lib.reporter.DefaultPatchReporter;
 import com.tencent.tinker.lib.service.PatchResult;
-import com.tencent.tinker.loader.shareutil.ShareConstants;
 import com.tinkerpatch.sdk.TinkerPatch;
+import com.tinkerpatch.sdk.loader.TinkerPatchApplicationLike;
 import com.tinkerpatch.sdk.server.callback.ConfigRequestCallback;
 import com.tinkerpatch.sdk.server.callback.RollbackCallBack;
 import com.tinkerpatch.sdk.server.callback.TinkerPatchRequestCallback;
@@ -31,72 +26,60 @@ import java.util.HashMap;
  *
  * @author gaoxiaoiduo
  * @version 1.0
- * @date 18/12/18下午4:27
+ * @date 18/12/20下午2:40
  */
-@SuppressWarnings("unused")
-@DefaultLifeCycle(
-        application = "com.gxd.tinker.app.GxdApplication",     //application类名
-        flags = ShareConstants.TINKER_ENABLE_ALL,
-        loadVerifyFlag = false)
-public class GxdApplicationLink extends DefaultApplicationLike
+public class GxdSampleApplication extends Application
 {
-    private static final String TAG = GxdApplicationLink.class.getSimpleName();
+    private static final String TAG = GxdSampleApplication.class.getSimpleName();
 
-    public static Application application;
+    private ApplicationLike tinkerApplicationLike;
 
-    public GxdApplicationLink (
-            Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag,
-            long applicationStartElapsedTime, long applicationStartMillisTime,
-            Intent tinkerResultIntent)
-    {
-
-        super(application, tinkerFlags, tinkerLoadVerifyFlag, applicationStartElapsedTime,
-                applicationStartMillisTime, tinkerResultIntent);
-    }
-
-    /**
-     * install multiDex before install tinker
-     * so we don't need to put the tinker lib classes in the main dex
-     *
-     * @param base
-     */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
-    public void onBaseContextAttached (Context base)
+    protected void attachBaseContext (Context base)
     {
 
-        super.onBaseContextAttached(base);
+        super.attachBaseContext(base);
         //you must install multiDex whatever tinker is installed!
-        MultiDex.install(base);
+        //MultiDex.install(base);
     }
 
     /**
-     * 我们需要确保至少对主进程跟patch进程初始化 TinkerPatch
+     * 由于在onCreate替换真正的Application,
+     * 我们建议在onCreate初始化TinkerPatch,而不是attachBaseContext
      */
     @Override
     public void onCreate ()
     {
 
         super.onCreate();
-        initTinker();
+        initTinkerPatch();
     }
 
-    private void initTinker ()
+    /**
+     * 我们需要确保至少对主进程跟patch进程初始化 TinkerPatch
+     */
+    private void initTinkerPatch ()
     {
-
+        // 我们可以从这里获得Tinker加载过程的信息
         if (BuildConfig.TINKER_ENABLE)
         {
-            //开始检查是否有补丁，这里配置的是每隔访问3小时服务器是否有更新。
-            TinkerPatch.init(this)
+            tinkerApplicationLike = TinkerPatchApplicationLike.getTinkerPatchApplicationLike();
+            // 初始化TinkerPatch SDK
+            TinkerPatch.init(
+                    tinkerApplicationLike
+                    //                new TinkerPatch.Builder(tinkerApplicationLike)
+                    //                    .requestLoader(new OkHttp3Loader())
+                    //                    .build()
+                            )
                     .reflectPatchLibrary()
                     .setPatchRollbackOnScreenOff(true)
                     .setPatchRestartOnSrceenOff(true)
                     .setFetchPatchIntervalByHours(3);
-
             // 获取当前的补丁版本
-            Log.d(TAG, "current patch version is " + TinkerPatch.with().getPatchVersion());
-
-            //每隔3个小时去访问后台时候有更新,通过handler实现轮训的效果
+            Log.d(TAG, "Current patch version is " + TinkerPatch.with().getPatchVersion());
+            // 每隔3个小时(通过setFetchPatchIntervalByHours设置)去访问后台时候有更新,通过handler实现轮训的效果
+            // fetchPatchUpdateAndPollWithInterval 与 fetchPatchUpdate(false)
+            // 不同的是，会通过handler的方式去轮询
             TinkerPatch.with().fetchPatchUpdateAndPollWithInterval();
         }
     }
@@ -108,7 +91,7 @@ public class GxdApplicationLink extends DefaultApplicationLike
     private void useSample ()
     {
 
-        TinkerPatch.init(this)
+        TinkerPatch.init(tinkerApplicationLike)
                 //是否自动反射Library路径,无须手动加载补丁中的So文件
                 //注意,调用在反射接口之后才能生效,你也可以使用Tinker的方式加载Library
                 .reflectPatchLibrary()
@@ -147,6 +130,7 @@ public class GxdApplicationLink extends DefaultApplicationLike
                 .setPatchRestartOnSrceenOff(true)
                 //我们可以通过ResultCallBack设置对合成后的回调
                 //例如弹框什么
+                //注意，setPatchResultCallback 的回调是运行在 intentService 的线程中
                 .setPatchResultCallback(new ResultCallBack()
                 {
                     @Override
@@ -172,22 +156,21 @@ public class GxdApplicationLink extends DefaultApplicationLike
     }
 
     /**
-     * 自定义Tinker类的高级用法,一般不推荐使用
+     * 自定义Tinker类的高级用法, 使用更灵活，但是需要对tinker有更进一步的了解
      * 更详细的解释请参考:http://tinkerpatch.com/Docs/api
      */
     private void complexSample ()
     {
-
-        TinkerPatch.Builder builder = new TinkerPatch.Builder(this);
         //修改tinker的构造函数,自定义类
-        builder.listener(new DefaultPatchListener(getApplication()))
-                .loadReporter(new DefaultLoadReporter(getApplication()))
-                .patchReporter(new DefaultPatchReporter(getApplication()))
+        TinkerPatch.Builder builder = new TinkerPatch.Builder(tinkerApplicationLike)
+                .listener(new DefaultPatchListener(this))
+                .loadReporter(new DefaultLoadReporter(this))
+                .patchReporter(new DefaultPatchReporter(this))
                 .resultServiceClass(TinkerServerResultService.class)
                 .upgradePatch(new UpgradePatch())
                 .patchRequestCallback(new TinkerPatchRequestCallback());
+        //.requestLoader(new OkHttpLoader());
 
         TinkerPatch.init(builder.build());
     }
 }
-
