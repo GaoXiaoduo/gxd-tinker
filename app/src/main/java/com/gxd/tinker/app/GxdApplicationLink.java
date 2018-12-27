@@ -37,9 +37,9 @@ public class GxdApplicationLink extends DefaultApplicationLike
     {
 
         super.onCreate();
-        // 这里实现SDK初始化，appId替换成你的在Bugly平台申请的appId
+        // todo 这里实现SDK初始化，appId替换成你的在Bugly平台申请的appId
         // 调试时，将第三个参数改为true
-        Bugly.init(getApplication(), "900029763", true);
+        Bugly.init(getApplication(), "8ea3227c1a", true);
     }
 
 

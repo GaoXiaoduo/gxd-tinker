@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,8 +15,13 @@ import android.widget.Toast;
 
 import com.tencent.bugly.beta.Beta;
 
+/**
+ * 不需要在运行时添加读写权限
+ **/
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
+    private static final int REQUEST_CODE_SDCARD_READ = 1;
+
     private TextView tvCurrentVersion;
 
     private Button btnShowToast;
@@ -60,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //        btnCheckUpgrade = (Button) findViewById(R.id.btnCheckUpgrade);
         //        btnCheckUpgrade.setOnClickListener(this);
 
-        tvCurrentVersion.setText("当前版本：" + getCurrentVersion(this));
+        tvCurrentVersion.setText("包括我吗？ 当前版本：" + getCurrentVersion(this));
     }
 
     @Override
@@ -79,9 +85,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             // 本地加载补丁测试
             case R.id.btnLoadPatch:
-                Beta.applyTinkerPatch(getApplicationContext(), Environment
-                        .getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip" +
-                        ".apk");
+                Toast.makeText(this, "button load on click", Toast.LENGTH_LONG).show();
+                if (isGrantSDCardReadPermission())
+                {
+                    getPatchFile();
+                }
+                else
+                {
+                    requestPermission();
+                }
+
                 break;
             //            case R.id.btnLoadLibrary: // 本地加载so库测试
             //                TestJNI testJNI = new TestJNI();
@@ -141,6 +154,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void getPatchFile ()
+    {
+
+        Beta.applyTinkerPatch(getApplicationContext(), Environment
+                .getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
+    }
+
     @Override
     public void onBackPressed ()
     {
@@ -149,5 +169,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.e("MainActivity", "onBackPressed");
 
         Beta.unInit();
+    }
+
+    private boolean isGrantSDCardReadPermission ()
+    {
+
+        return PermissionUtils.isGrantSDCardReadPermission(this);
+    }
+
+    private void requestPermission ()
+    {
+
+        PermissionUtils.requestSDCardReadPermission(this, REQUEST_CODE_SDCARD_READ);
+    }
+
+    @Override
+    public void onRequestPermissionsResult (
+            int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults)
+    {
+
+        switch (requestCode)
+        {
+            case REQUEST_CODE_SDCARD_READ:
+                handlePermissionResult();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void handlePermissionResult ()
+    {
+
+        if (isGrantSDCardReadPermission())
+        {
+            getPatchFile();
+        }
+        else
+        {
+            Toast.makeText(this, "failure because without sd card read permission", Toast
+                    .LENGTH_SHORT).show();
+        }
     }
 }
