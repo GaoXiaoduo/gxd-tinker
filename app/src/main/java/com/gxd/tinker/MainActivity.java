@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnLoadPatch = (Button) findViewById(R.id.btnLoadPatch);
         btnLoadPatch.setOnClickListener(this);
 
-        tvCurrentVersion.setText("我是patch 1 版本，当前版本：" + getCurrentVersion(this));
-        // tvCurrentVersion.setText("我是base版本，当前版本：" + getCurrentVersion(this));
+        //tvCurrentVersion.setText("我是patch 1 版本，当前版本：" + getCurrentVersion(this));
+        tvCurrentVersion.setText("我是base版本，当前版本：" + getCurrentVersion(this));
     }
 
 
