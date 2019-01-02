@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
         // 无需再单独引用tinker的其他库
-        classpath "com.tinkerpatch.sdk:tinkerpatch-gradle-plugin:${TINKERPATCH_VERSION}"
+        classpath "com.tinkerpatch.sdk:tinkerpatch-gradle-plugin:1.2.9"
     }
 }
 

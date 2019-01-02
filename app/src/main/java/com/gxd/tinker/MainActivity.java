@@ -27,14 +27,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button btnKillSelf;
 
-    private Button btnLoadLibrary;
-
-    private Button btnDownloadPatch;
-
-    private Button btnUserPatch;
-
-    private Button btnCheckUpgrade;
-
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
@@ -42,28 +34,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-    }
-
-    private void initView ()
-    {
-
-        tvCurrentVersion = (TextView) findViewById(R.id.tvVersion);
-        btnShowToast = (Button) findViewById(R.id.btnShowToast);
-        btnShowToast.setOnClickListener(this);
-        btnKillSelf = (Button) findViewById(R.id.btnKillSelf);
-        btnKillSelf.setOnClickListener(this);
-        btnLoadPatch = (Button) findViewById(R.id.btnLoadPatch);
-        btnLoadPatch.setOnClickListener(this);
-        //        btnLoadLibrary = (Button) findViewById(R.id.btnLoadLibrary);
-        //        btnLoadLibrary.setOnClickListener(this);
-        //        btnDownloadPatch = (Button) findViewById(R.id.btnDownloadPatch);
-        //        btnDownloadPatch.setOnClickListener(this);
-        //        btnUserPatch = (Button) findViewById(R.id.btnPatchDownloaded);
-        //        btnUserPatch.setOnClickListener(this);
-        //        btnCheckUpgrade = (Button) findViewById(R.id.btnCheckUpgrade);
-        //        btnCheckUpgrade.setOnClickListener(this);
-
-        tvCurrentVersion.setText("我是base版本，当前版本：" + getCurrentVersion(this));
     }
 
     @Override
@@ -91,25 +61,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     requestPermission();
                 }
-
                 break;
-            //            case R.id.btnLoadLibrary: // 本地加载so库测试
-            //                TestJNI testJNI = new TestJNI();
-            //                testJNI.createANativeCrash();
-            //                break;
-            //            case R.id.btnDownloadPatch:
-            //                Beta.downloadPatch();
-            //                break;
-            //            case R.id.btnPatchDownloaded:
-            //                Beta.applyDownloadedPatch();
-            //                break;
-            //            case R.id.btnCheckUpgrade:
-            //                Beta.checkUpgrade();
-            //                break;
             default:
                 break;
         }
     }
+
+    private void initView ()
+    {
+
+        tvCurrentVersion = (TextView) findViewById(R.id.tvVersion);
+        btnShowToast = (Button) findViewById(R.id.btnShowToast);
+        btnShowToast.setOnClickListener(this);
+        btnKillSelf = (Button) findViewById(R.id.btnKillSelf);
+        btnKillSelf.setOnClickListener(this);
+        btnLoadPatch = (Button) findViewById(R.id.btnLoadPatch);
+        btnLoadPatch.setOnClickListener(this);
+
+        tvCurrentVersion.setText("我是patch 1 版本，当前版本：" + getCurrentVersion(this));
+        // tvCurrentVersion.setText("我是base版本，当前版本：" + getCurrentVersion(this));
+    }
+
 
     /**
      * 根据应用patch包前后来测试是否应用patch包成功.
@@ -141,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int versionCode = packageInfo.versionCode;
             String versionName = packageInfo.versionName;
 
-            return versionName + "." + versionCode;
+            return versionName + "; code:" + versionCode;
         } catch (Exception e)
         {
             e.printStackTrace();

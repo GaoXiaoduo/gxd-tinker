@@ -15,7 +15,8 @@ android {
          * you can use multiDex and install it in your ApplicationLifeCycle implement
          */
         multiDexEnabled true
-        multiDexKeepProguard file("tinkerMultidexKeep.pro") //keep specific classes using proguard syntax
+        multiDexKeepProguard file("tinkerMultidexKeep.pro")
+        //keep specific classes using proguard syntax
     }
     signingConfigs {
 
@@ -86,9 +87,9 @@ dependencies {
     // 用来测试multiDex
     implementation 'com.android.support:multidex:1.0.3'
     // 若使用annotation需要单独引用,对于tinker的其他库都无需再引用
-    annotationProcessor("com.tinkerpatch.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
-    compileOnly("com.tinkerpatch.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
-    implementation("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
-    //provided("com.tinkerpatch.tinker:tinker-android-anno:1.9.9")
-    //compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:1.2.9")
+    annotationProcessor("com.tinkerpatch.tinker:tinker-android-anno:1.9.9") { changing = true }
+    //compileOnly("com.tinkerpatch.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
+    //implementation("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
+    compileOnly("com.tinkerpatch.tinker:tinker-android-anno:1.9.9"){ changing = true }
+    implementation("com.tinkerpatch.sdk:tinkerpatch-android-sdk:1.2.9"){ changing = true }
 }
