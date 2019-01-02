@@ -95,16 +95,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    // 可选，用于生成application类
-    // compileOnly('com.tencent.tinker:tinker-android-anno:1.9.1') { changing = true }
-    // tinker的核心库
-    // implementation('com.tencent.tinker:tinker-android-lib:1.9.1') { changing = true }
-    // 可选，用于生成application类
-    compileOnly "com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}"
-    // tinker的核心库
-    implementation "com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}"
     // 用来测试multiDex
     implementation 'com.android.support:multidex:1.0.3'
+    // tinker的核心库
+    implementation("com.tencent.tinker:tinker-android-lib:${TINKER_VERSION}") { changing = true }
+    // 可选，用于生成application类
+    compileOnly("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") { changing = true }
+    annotationProcessor("com.tencent.tinker:tinker-android-anno:${TINKER_VERSION}") {
+        changing = true
+    }
 }
 
 def gitSha() {
