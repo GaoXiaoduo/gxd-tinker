@@ -38,15 +38,16 @@ tinkerpatchSupport {
     // 将每次编译产生的 apk/mapping.txt/R.txt 归档存储的位置
     autoBackupApkPath = "${bakPath}"
     // 在TinkerPatch平台申请的appkey
-    appKey = "f938475486f91936"
+    appKey = "d9950c3d6e959ca8"
 
     /** 注意: 若发布新的全量包, appVersion一定要更新
      *  在TinkerPatch平台输入的版本号,注意,我们使用 appVersion 作为 TinkerId,
      *  我们需要保证每个发布出去的基础安装包的 appVersion 都不一样
      **/
     appVersion = "1.0.0"
-
+    // build/bakapk/app-1.0.0-1112-12-49-34/release
     def pathPrefix = "${bakPath}/${baseInfo}/${variantName}/"
+    // app-release
     def name = "${project.name}-${variantName}"
     // 基准包的文件路径, 对应 tinker 插件中的 oldApk 参数;编译补丁包时，
     // 必需指定基准版本的 apk，默认值为空，则表示不是进行补丁包的编译。

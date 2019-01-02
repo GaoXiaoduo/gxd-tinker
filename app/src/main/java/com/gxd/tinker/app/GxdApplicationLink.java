@@ -27,7 +27,7 @@ import com.tinkerpatch.sdk.tinker.service.TinkerServerResultService;
 import java.util.HashMap;
 
 /**
- * tinkerpatch.gradle 文件中 reflectApplication = true 时使用本类
+ * tinkerpatch.gradle 文件中 reflectApplication = false 时使用本类
  *
  * @author gaoxiaoiduo
  * @version 1.0
