@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tencent.tinker.lib.tinker.TinkerInstaller;
 
 /**
  * 不需要在运行时添加读写权限
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initView ()
     {
 
-        tvCurrentVersion = (TextView) findViewById(R.id.tvVersion);
+        tvCurrentVersion = (TextView) this.findViewById(R.id.tvVersion);
         btnShowToast = (Button) findViewById(R.id.btnShowToast);
         btnShowToast.setOnClickListener(this);
         btnKillSelf = (Button) findViewById(R.id.btnKillSelf);
@@ -121,6 +124,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return "";
 
+    }
+
+    public void loadPatch (View view)
+    {
+
+        TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(),
+                Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed.apk");
     }
 
     public void getPatchFile ()

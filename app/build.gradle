@@ -277,7 +277,8 @@ if (buildWithTinker()) {
              */
             loader = [
                     //use sample, let BaseBuildInfo unchangeable with tinker
-                    "tinker.sample.android.app.BaseBuildInfo"
+                    //"tinker.sample.android.app.BaseBuildInfo"
+                    "com.gxd.tinker.app.GxdApplication"
             ]
         }
 
